@@ -1,14 +1,18 @@
 const express = require('express')
 const bodyParser = require('body-parser')
 const morgan = require('morgan')
-const cors = require('cord')
+const cors = require('cors')
 
 const app = express()
-const {APP_PORT} = process.env
+const { APP_PORT } = process.env
 
-app.use(bodyParser.urlencoded({extended: false}))
+app.use(bodyParser.urlencoded({ extended: false }))
 app.use(morgan('dev'))
 app.use(cors())
+
+const userRoute = require('./routes/users')
+
+app.use('/users', userRoute)
 
 app.get('/', (req, res) => {
   res.send({
@@ -17,6 +21,6 @@ app.get('/', (req, res) => {
   })
 })
 
-app.listen(APP_PORT, ()=>{
+app.listen(APP_PORT, () => {
   console.log(`App listen on port ${APP_PORT}`)
 })
