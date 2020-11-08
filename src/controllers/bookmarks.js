@@ -1,4 +1,4 @@
-const { Bookmarks } = require('../models')
+const { Bookmarks, User, News, Category } = require('../models')
 const Joi = require('joi')
 const responseStandard = require('../helpers/response')
 
@@ -6,11 +6,24 @@ module.exports = {
   getData: async (req, res) => {
     console.log(req.user.detailUser.id)
     const { id } = req.user.detailUser
-    const result = await Bookmarks.findAll({
-      where: {
-        user_id: id
+    const result1 = await Bookmarks.findAll({
+      include: {
+        model: User,
+        attributes: {
+          exclude: ['birth', 'email', 'password', 'createdAt', 'updatedAt']
+        }
       }
     })
+    const result2 = await Bookmarks.findAll({
+      include: { model: News }
+    })
+    const result3 = await Bookmarks.findAll({
+      include: {
+        model: Category,
+        attributes: { exclude: ['createdAt', 'updatedAt'] }
+      }
+    })
+    const result = { result1, ...result2, ...result3 }
     responseStandard(res, 'Your bookmarks', { result }, 200, true)
   },
   createData: async(req, res) => {

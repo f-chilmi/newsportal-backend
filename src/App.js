@@ -16,13 +16,13 @@ const authRoute = require('./routes/auth')
 const userRoute = require('./routes/users')
 const newsRoute = require('./routes/news')
 const bookmarksRoute = require('./routes/bookmarks')
-// const publicRoute = require('./routes/publicNews')
+const publicRoute = require('./routes/publicNews')
 
 app.use('/auth', authRoute)
 app.use('/users', tokenAuth, userRoute)
 app.use('/news', tokenAuth, newsRoute)
 app.use('/bookmarks', tokenAuth, bookmarksRoute)
-// app.use('/public', publicRoute)
+app.use('/public', publicRoute)
 
 app.listen(APP_PORT, () => {
   console.log(`App listen on port ${APP_PORT}`)
