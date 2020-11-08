@@ -10,16 +10,19 @@ app.use(bodyParser.urlencoded({ extended: false }))
 app.use(morgan('dev'))
 app.use(cors())
 
+const tokenAuth = require('./middleware/auth')
+
+const authRoute = require('./routes/auth')
 const userRoute = require('./routes/users')
+const newsRoute = require('./routes/news')
+const bookmarksRoute = require('./routes/bookmarks')
+// const publicRoute = require('./routes/publicNews')
 
-app.use('/users', userRoute)
-
-app.get('/', (req, res) => {
-  res.send({
-    success: true,
-    message: 'Backend is running well'
-  })
-})
+app.use('/auth', authRoute)
+app.use('/users', tokenAuth, userRoute)
+app.use('/news', tokenAuth, newsRoute)
+app.use('/bookmarks', tokenAuth, bookmarksRoute)
+// app.use('/public', publicRoute)
 
 app.listen(APP_PORT, () => {
   console.log(`App listen on port ${APP_PORT}`)
