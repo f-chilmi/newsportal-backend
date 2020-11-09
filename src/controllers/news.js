@@ -35,23 +35,17 @@ module.exports = {
     // if (typeof sort === 'object') {
     //   sort = Object.values(sort)[0]
     // }
-    const result0 = await News.findAll({
-      include: {
-        model: User,
-        attributes: {
-          exclude: ['birth', 'email', 'password', 'createdAt', 'updatedAt']
-        }
-      }
+    const result = await News.findAll({
+      include: [
+        {
+          model: User,
+          attributes: { exclude: ['birth', 'email', 'password', 'createdAt', 'updatedAt'] }
+        },
+        {
+          model: Category,
+          attributes: { exclude: ['createdAt', 'updatedAt'] }
+        }]
     })
-    const result1 = await News.findAll({
-      include: {
-        model: Category,
-        attributes: {
-          exclude: ['createdAt', 'updatedAt']
-        }
-      }
-    })
-    const result = { category: result1[0].Category, ...result0 }
     responseStandard(res, 'List of news', { result }, 200, true)
   },
   updateNews: async (req, res) => {
