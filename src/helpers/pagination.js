@@ -11,7 +11,6 @@ module.exports = {
       nextLink: null,
       prevLink: null
     }
-
     pageInfo.count = count
     pageInfo.pages = Math.ceil(count / limit)
     const { pages, currentPage } = pageInfo

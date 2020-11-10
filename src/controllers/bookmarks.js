@@ -4,29 +4,24 @@ const responseStandard = require('../helpers/response')
 
 module.exports = {
   getData: async (req, res) => {
-    console.log(req.user.detailUser.id)
-    const { id } = req.user.detailUser
-    const result1 = await Bookmarks.findAll({
-      include: {
-        model: User,
-        attributes: {
-          exclude: ['birth', 'email', 'password', 'createdAt', 'updatedAt']
-        }
-      }
+    // console.log(req.user.detailUser.id)
+    // const { id } = req.user.detailUser
+    const result = await Bookmarks.findAll({
+      attributes: { exclude: ['user_id', 'category_id', 'news_id'] },
+      include: [
+        {
+          model: User,
+          attributes: { exclude: ['birth', 'email', 'password', 'createdAt', 'updatedAt'] }
+        },
+        { model: News },
+        {
+          model: Category,
+          attributes: { exclude: ['createdAt', 'updatedAt'] }
+        }]
     })
-    const result2 = await Bookmarks.findAll({
-      include: { model: News }
-    })
-    const result3 = await Bookmarks.findAll({
-      include: {
-        model: Category,
-        attributes: { exclude: ['createdAt', 'updatedAt'] }
-      }
-    })
-    const result = { result1, ...result2, ...result3 }
     responseStandard(res, 'Your bookmarks', { result }, 200, true)
   },
-  createData: async(req, res) => {
+  createData: async (req, res) => {
     const { id } = req.user.detailUser
     const schema = Joi.object({
       category_id: Joi.string().required(),
@@ -34,7 +29,7 @@ module.exports = {
     })
     const { value, error } = schema.validate(req.body)
     if (error) {
-      return responseStandard(res, {error: error.message}, {}, 400, false)
+      return responseStandard(res, { error: error.message }, {}, 400, false)
     }
     const data = {
       user_id: id,

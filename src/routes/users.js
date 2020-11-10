@@ -5,6 +5,7 @@ const userController = require('../controllers/users')
 
 // route.get('/', userController.showUsers)
 route.get('/', userController.showUser)
+route.get('/news', userController.showNews)
 route.patch('/', uploadHelper, userController.updateUser)
 route.delete('/', userController.deleteUser)
 

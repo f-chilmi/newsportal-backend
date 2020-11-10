@@ -1,4 +1,4 @@
-const { User } = require('../models')
+const { User, News } = require('../models')
 const bcrypt = require('bcryptjs')
 const Joi = require('joi')
 const jwt = require('jsonwebtoken')
@@ -69,6 +69,11 @@ module.exports = {
   showUser: async (req, res) => {
     const { id } = req.user.detailUser
     const result = await User.findByPk(id)
+    responseStandard(res, 'User detail', { result }, 200, true)
+  },
+  showNews: async (req, res) => {
+    const { id } = req.user.detailUser
+    const result = await News.findAll({ where: { user_id: id } })
     responseStandard(res, 'User detail', { result }, 200, true)
   },
   updateUser: async (req, res) => {

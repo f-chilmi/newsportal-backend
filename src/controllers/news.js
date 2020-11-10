@@ -1,6 +1,7 @@
 const { News, Category, User } = require('../models')
 const Joi = require('joi')
 const responseStandard = require('../helpers/response')
+const { Op } = require('sequelize')
 const { pagination } = require('../helpers/pagination')
 
 module.exports = {
@@ -27,15 +28,35 @@ module.exports = {
     responseStandard(res, 'News uploaded', { data }, 200, true)
   },
   showNews: async(req, res) => {
-    // const { page = 1, limit = 10, search = '', sort = '' } = req.query
-    // const offset = (page - 1) * limit
+    const { page = 1, limit = 5, search = '', sort = '' } = req.query
+    const offset = (page - 1) * limit
+    console.log(offset)
     // if (typeof search === 'object') {
     //   search = Object.values(search)[0]
     // }
     // if (typeof sort === 'object') {
     //   sort = Object.values(sort)[0]
     // }
-    const result = await News.findAll({
+    const result = await News.findAndCountAll({
+      include: [
+        {
+          model: User,
+          attributes: { exclude: ['birth', 'email', 'password', 'createdAt', 'updatedAt'] }
+        },
+        {
+          model: Category,
+          attributes: { exclude: ['createdAt', 'updatedAt'] }
+        }],
+      where: { title: { [Op.substring]: search } },
+      offset: parseInt(offset),
+      limit: parseInt(limit)
+    })
+    const pagination1 = pagination('', req.query, page, limit, result.count)
+    responseStandard(res, 'List of news', { result, pagination1 }, 200, true)
+  },
+  showNewsById: async(req, res) => {
+    const { id } = req.params
+    const result = await News.findByPk(id, {
       include: [
         {
           model: User,
