@@ -10,6 +10,9 @@ app.use(bodyParser.urlencoded({ extended: false }))
 app.use(morgan('dev'))
 app.use(cors())
 
+// import static files
+app.use('/uploads', express.static('assets/uploads'))
+
 const tokenAuth = require('./middleware/auth')
 
 const authRoute = require('./routes/auth')

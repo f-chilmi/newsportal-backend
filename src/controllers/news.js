@@ -28,7 +28,7 @@ module.exports = {
     responseStandard(res, 'News uploaded', { data }, 200, true)
   },
   showNews: async(req, res) => {
-    const { page = 1, limit = 5, search = '', sort = '' } = req.query
+    const { page = 1, limit = 10, search = '', sort = '' } = req.query
     const offset = (page - 1) * limit
     console.log(offset)
     // if (typeof search === 'object') {
@@ -68,6 +68,11 @@ module.exports = {
         }]
     })
     responseStandard(res, 'List of news', { result }, 200, true)
+  },
+  newsById: async(req, res) => {
+    const { id } = req.params
+    const result = await News.findAll({ where: { category_id: id } })
+    responseStandard(req, 'News by category', { result }, 200, true)
   },
   updateNews: async (req, res) => {
     // const userId = req.user.detailUser.id

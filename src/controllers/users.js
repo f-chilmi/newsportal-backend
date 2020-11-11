@@ -1,4 +1,4 @@
-const { User, News } = require('../models')
+const { User, News, Category } = require('../models')
 const bcrypt = require('bcryptjs')
 const Joi = require('joi')
 const jwt = require('jsonwebtoken')
@@ -73,7 +73,16 @@ module.exports = {
   },
   showNews: async (req, res) => {
     const { id } = req.user.detailUser
-    const result = await News.findAll({ where: { user_id: id } })
+    const result = await News.findAll({ include: [
+      {
+        model: User,
+        attributes: { exclude: ['birth', 'email', 'password', 'createdAt', 'updatedAt'] }
+      },
+      {
+        model: Category,
+        attributes: { exclude: ['createdAt', 'updatedAt'] }
+      }],
+    where: { user_id: id } })
     responseStandard(res, 'User detail', { result }, 200, true)
   },
   updateUser: async (req, res) => {
