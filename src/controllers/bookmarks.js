@@ -5,7 +5,7 @@ const responseStandard = require('../helpers/response')
 module.exports = {
   getData: async (req, res) => {
     // console.log(req.user.detailUser.id)
-    // const { id } = req.user.detailUser
+    const { id } = req.user.detailUser
     const result = await Bookmarks.findAll({
       attributes: { exclude: ['user_id', 'category_id', 'news_id'] },
       include: [
@@ -17,7 +17,8 @@ module.exports = {
         {
           model: Category,
           attributes: { exclude: ['createdAt', 'updatedAt'] }
-        }]
+        }],
+        where: { user_id: id }
     })
     responseStandard(res, 'Your bookmarks', { result }, 200, true)
   },

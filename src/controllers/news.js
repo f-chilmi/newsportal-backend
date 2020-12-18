@@ -25,7 +25,9 @@ module.exports = {
       image: image
     }
     const results = await News.create(data)
-    responseStandard(res, 'News uploaded', { data }, 200, true)
+    console.log(results.id)
+    // results.update(image)
+    responseStandard(res, 'News uploaded', { ...data }, 200, true)
   },
   showNews: async(req, res) => {
     const { page = 1, limit = 10, search = '', sort = '' } = req.query

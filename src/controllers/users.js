@@ -48,13 +48,49 @@ module.exports = {
           username: result[0].username,
           email: result[0].email
         }
-        const token = jwt.sign({ detailUser }, process.env.APP_KEY)
+        const token = jwt.sign({ detailUser }, process.env.APP_KEY, { expiresIn: '365 days' })
         return responseStandard(res, 'Login successfully!', { token }, 200, true)
       } else {
         return responseStandard(res, 'Wrong email or password', {}, 400, false)
       }
     } else {
       return responseStandard(res, 'Wrong email or password', {}, 400, false)
+    }
+  },
+  forgotPassword: async (req, res) => {
+    const { email, newPassword, confirmNewPassword } = req.body
+    if (newPassword === confirmNewPassword) {
+      const dbHasEmail = await User.findAll({ where: { email: email } })
+      if (dbHasEmail.length) {
+        // const oldPassword = dbHasEmail[0].dataValues.password
+        const password = await bcrypt.hash(newPassword, await bcrypt.genSalt())
+        dbHasEmail[0].password = password
+        dbHasEmail[0].save()
+        responseStandard(res, 'Password changed', { ...dbHasEmail[0].dataValues, password }, 200, true)
+      } else {
+        responseStandard(res, 'your email is not registered', {}, 400, false)
+      }
+    } else {
+      responseStandard(res, 'password must be the same', {}, 400, false)
+    }
+  },
+  changePassword: async (req, res) => {
+    const { id } = req.user.detailUser
+    const { oldPassword, newPassword, confirmNewPassword } = req.body
+    if (newPassword === confirmNewPassword) {
+      const dbHasId = await User.findByPk(id)
+      const passwordDB = dbHasId.dataValues.password
+      const comparePassword = bcrypt.compareSync(oldPassword, passwordDB)
+      if (comparePassword) {
+        const newpassword = await bcrypt.hash(newPassword, await bcrypt.genSalt())
+        dbHasId.password = newpassword
+        dbHasId.save()
+        responseStandard(res, 'Password changed', { ...dbHasId.dataValues, newpassword }, 200, true)
+      } else {
+        responseStandard(res, 'Type your old password correctly', {}, 400, false)
+      }
+    } else {
+      responseStandard(res, 'password must be the same', {}, 400, false)
     }
   },
   showUsers: async (req, res) => {
@@ -73,16 +109,18 @@ module.exports = {
   },
   showNews: async (req, res) => {
     const { id } = req.user.detailUser
-    const result = await News.findAll({ include: [
-      {
-        model: User,
-        attributes: { exclude: ['birth', 'email', 'password', 'createdAt', 'updatedAt'] }
-      },
-      {
-        model: Category,
-        attributes: { exclude: ['createdAt', 'updatedAt'] }
-      }],
-    where: { user_id: id } })
+    const result = await News.findAll({
+      include: [
+        {
+          model: User,
+          attributes: { exclude: ['birth', 'email', 'password', 'createdAt', 'updatedAt'] }
+        },
+        {
+          model: Category,
+          attributes: { exclude: ['createdAt', 'updatedAt'] }
+        }],
+      where: { user_id: id }
+    })
     responseStandard(res, 'User detail', { result }, 200, true)
   },
   updateUser: async (req, res) => {
@@ -94,7 +132,7 @@ module.exports = {
       if (req.file) {
         const image = `uploads/${req.file.filename}`
         result.update({ ...data, image })
-        responseStandard(res, `User ${id} updated`, { data: {...data, image} }, 200, true)
+        responseStandard(res, `User ${id} updated`, { data: { ...data, image } }, 200, true)
       } else {
         result.update(data)
         responseStandard(res, `User ${id} updated`, { data }, 200, true)
