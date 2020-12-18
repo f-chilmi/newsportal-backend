@@ -32,13 +32,7 @@ module.exports = {
   showNews: async(req, res) => {
     const { page = 1, limit = 10, search = '', sort = '' } = req.query
     const offset = (page - 1) * limit
-    console.log(offset)
-    // if (typeof search === 'object') {
-    //   search = Object.values(search)[0]
-    // }
-    // if (typeof sort === 'object') {
-    //   sort = Object.values(sort)[0]
-    // }
+    
     const result = await News.findAndCountAll({
       include: [
         {
@@ -53,7 +47,7 @@ module.exports = {
       offset: parseInt(offset),
       limit: parseInt(limit)
     })
-    const pagination1 = pagination('', req.query, page, limit, result.count)
+    const pagination1 = pagination('/public', req.query, page, limit, result.count)
     responseStandard(res, 'List of news', { result, pagination1 }, 200, true)
   },
   showNewsById: async(req, res) => {

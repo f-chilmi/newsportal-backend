@@ -1,5 +1,5 @@
 const qs = require('querystring')
-const { APP_URL } = process.env
+const { APP_URL, APP_PORT } = process.env
 module.exports = {
   pagination: (route, query, page, limit, count) => {
     page = +page
@@ -15,11 +15,11 @@ module.exports = {
     pageInfo.pages = Math.ceil(count / limit)
     const { pages, currentPage } = pageInfo
     if (currentPage < pages) {
-      pageInfo.nextLink = `${APP_URL}${route}?${qs.stringify({ ...query, ...{ page: page + 1 } })}`
+      pageInfo.nextLink = `${APP_URL}:${APP_PORT}${route}?${qs.stringify({ ...query, ...{ page: page + 1 } })}`
     }
 
     if (currentPage > 1) {
-      pageInfo.prevLink = `${APP_URL}${route}?${qs.stringify({ ...query, ...{ page: page - 1 } })}`
+      pageInfo.prevLink = `${APP_URL}:${APP_PORT}${route}?${qs.stringify({ ...query, ...{ page: page - 1 } })}`
     }
     return pageInfo
   }
